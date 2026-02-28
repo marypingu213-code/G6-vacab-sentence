@@ -178,7 +178,7 @@ const allLessonsData = {
             // 🌟 畔：修改了部件1比例，大幅下調至 0.25 確保有感變化
             { word: "畔", parts: ["images/L5/筆順-畔-部件-1.png", "images/L5/筆順-畔-部件-2.png"], pos: [{x: -25, y: 39, scale: 0.25}, {x: 39, y: -89, scale: 0.4}] },
             { word: "巒", parts: ["images/L5/筆順-巒-部件-1.png", "images/L5/筆順-巒-部件-2.png"], pos: [{x: -95, y: -32, scale: 0.35}, {x: -21, y: 128, scale: 0.4}] },
-            { word: "鰭", parts: ["images/L6/筆順-鰭-部件-1.png", "images/L6/筆順-鰭-部件-2.png", "images/L6/筆順-鰭-部件-3.png"], pos: [{x: -38, y: -78, scale: 0.5}, {x: 62, y: -48, scale: 0.45}, {x: 109, y: 118, scale: 0.55}] },
+            { word: "鰭", parts: ["images/L5/筆順-鰭-部件-1.png", "images/L5/筆順-鰭-部件-2.png", "images/L5/筆順-鰭-部件-3.png"], pos: [{x: -38, y: -78, scale: 0.5}, {x: 62, y: -48, scale: 0.45}, {x: 109, y: 118, scale: 0.45}] },
             { word: "韌", parts: ["images/L5/筆順-韌-部件-1.png", "images/L5/筆順-韌-部件-2.png"], pos: [{x: -41, y: -112, scale: 0.35}, {x: 44, y: -18, scale: 0.4}] },
             { word: "鞭", parts: ["images/L5/筆順-鞭-部件-1.png", "images/L5/筆順-鞭-部件-2.png"], pos: [{x: -65, y: -81, scale: 0.4}, {x: 4, y: -45, scale: 0.4}] },
             { word: "蒼", parts: ["images/L5/筆順-蒼-部件-1.png", "images/L5/筆順-蒼-部件-2.png"], pos: [{x: -49, y: 10, scale: 0.55}, {x: -110, y: -11, scale: 0.4}] },
