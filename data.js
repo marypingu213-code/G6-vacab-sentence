@@ -257,5 +257,13 @@ const allLessonsData = {
 
     // ================= 第九課 =================
     "9": { title: "第九課：每一個孩子都有一條自己的路", level1: [], level2: [], level3: [], level4: [] }
-
+}, // <--- 這裡記得補一個逗號
+    const allLessonsData = {
+    // ... 你原本的其他課次 ...
+    
+    "grade6_midterm": {
+        "title": "六年級期中挑戰賽 🏆",
+        "customUrl": "grade6_midterm.html"  // 這是指向我們剛剛做好的那個檔案
+    }
+};
 };
