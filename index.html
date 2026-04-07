@@ -48,7 +48,7 @@
 
     <script>
         window.onload = function() {
-            // 🌟 魔法 1：自動產生 QR Code (抓取您現在的網址，自動轉換成圖片)
+            // 🌟 魔法 1：自動產生 QR Code
             let cleanUrl = window.location.href.split('#')[0].split('?')[0]; 
             document.getElementById('qr-code-image').src = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(cleanUrl);
 
@@ -57,7 +57,16 @@
             for (let lessonId in allLessonsData) {
                 const lessonInfo = allLessonsData[lessonId];
                 const card = document.createElement('a');
-                card.href = `lesson.html?id=${lessonId}`; 
+                
+                // --- 這裡做了修改 ---
+                // 檢查 data.js 中是否有 customUrl 欄位
+                if (lessonInfo.customUrl) {
+                    card.href = lessonInfo.customUrl; // 直接連到指定的 HTML 檔案 (例如測驗網頁)
+                } else {
+                    card.href = `lesson.html?id=${lessonId}`; // 維持原本的流程
+                }
+                // ------------------
+
                 card.className = 'lesson-card';
                 
                 const title = document.createElement('div');
