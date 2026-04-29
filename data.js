@@ -219,8 +219,6 @@ const allLessonsData = {
             "遠看 就像在 銀河 衝浪 一樣 漂亮"
         ]
     },
-const allLessonsData = {
-    // ... (前面第一到第五課的內容保持不變) ...
 
     // ================= 第六課 =================
     "6": {
@@ -245,7 +243,7 @@ const allLessonsData = {
             { word: "縮", parts: ["images/L6/筆順-縮-部件-1.png", "images/L6/筆順-縮-部件-2.png", "images/L6/筆順-縮-部件-3.png", "images/L6/筆順-縮-部件-4.png"], pos: [{x: 90, y: 130}, {x: 150, y: 130}, {x: 90, y: 180}, {x: 150, y: 180}] },
             { word: "讓", parts: ["images/L6/筆順-讓-部件-1.png", "images/L6/筆順-讓-部件-2.png"], pos: [{x: 100, y: 180}, {x: 170, y: 180}] }
         ],
-        level2: [], // 若後續有需要請在此補充
+        level2: [],
         level3: [
             { question: "1. 不怕這一課的主角的工作是？", options: ["老師", "舞者", "校長", "廚師"], correct: "舞者" },
             { question: "2. 主角去的地方是？", options: ["英國", "日本", "韓國", "美國"], correct: "美國" },
