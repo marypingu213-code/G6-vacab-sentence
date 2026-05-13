@@ -15,6 +15,35 @@
         h1 { color: #5a4a42; font-size: 3.5vw; margin: 0 0 10px 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
         .subtitle { font-size: 1.8vw; color: #7b6855; margin: 0; }
         
+        /* 🏆 期末挑戰專屬按鈕樣式 */
+        .final-exam-btn {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 1vw 3vw;
+            font-size: 2vw;
+            font-weight: bold;
+            color: #fff;
+            background: linear-gradient(45deg, #ff6b6b, #e74c3c);
+            border-radius: 50px;
+            text-decoration: none;
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+            transition: transform 0.3s, box-shadow 0.3s;
+            animation: pulse 2s infinite; /* 呼吸燈動畫 */
+            border: 3px solid #fff;
+        }
+
+        .final-exam-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 20px rgba(231, 76, 60, 0.6);
+        }
+
+        /* 按鈕呼吸燈動畫特效 */
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(231, 76, 60, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
+        
         /* 📱 QR Code 專屬樣式 (固定在右上角) */
         .qr-box { position: absolute; top: 3%; right: 3%; background: #fff; padding: 10px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; border: 3px dashed #f39c12; transition: transform 0.3s; }
         .qr-box:hover { transform: scale(1.1); }
@@ -27,7 +56,14 @@
         .lesson-card:hover { transform: translateY(-10px) scale(1.05); box-shadow: 0 20px 40px rgba(0,0,0,0.15); background-color: #eafaf1; border-color: #2ecc71; }
         .lesson-title { font-size: 2vw; font-weight: bold; color: #2c3e50; text-align: center;}
 
-        @media (min-width: 1400px) { h1 { font-size: 48px; } .subtitle { font-size: 25px; } .lesson-title { font-size: 28px; } .qr-box p { font-size: 16px; } .qr-box img { width: 120px; height: 120px; } }
+        @media (min-width: 1400px) { 
+            h1 { font-size: 48px; } 
+            .subtitle { font-size: 25px; } 
+            .lesson-title { font-size: 28px; } 
+            .qr-box p { font-size: 16px; } 
+            .qr-box img { width: 120px; height: 120px; } 
+            .final-exam-btn { font-size: 26px; padding: 15px 40px; }
+        }
     </style>
 </head>
 <body>
@@ -41,6 +77,7 @@
         <div class="header-area">
             <h1>🏫 特教國語遊戲網 🎪</h1>
             <p class="subtitle">請選擇今天要挑戰的課程！</p>
+            <a href="final_level1.html" class="final-exam-btn">🔥 點我進入：期末國語大挑戰 🔥</a>
         </div>
         
         <div class="lesson-list" id="lesson-container"></div>
@@ -58,14 +95,12 @@
                 const lessonInfo = allLessonsData[lessonId];
                 const card = document.createElement('a');
                 
-                // --- 這裡做了修改 ---
                 // 檢查 data.js 中是否有 customUrl 欄位
                 if (lessonInfo.customUrl) {
                     card.href = lessonInfo.customUrl; // 直接連到指定的 HTML 檔案 (例如測驗網頁)
                 } else {
                     card.href = `lesson.html?id=${lessonId}`; // 維持原本的流程
                 }
-                // ------------------
 
                 card.className = 'lesson-card';
                 
