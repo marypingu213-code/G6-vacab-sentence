@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>期末國語挑戰：第二關</title>
+    <style>
+        body { font-family: '微軟正黑體', sans-serif; background-color: #eef2f5; margin: 0; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        #game-container { background: #fff; border-radius: 20px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); padding: 30px; max-width: 800px; width: 100%; text-align: center; margin-top: 20px; border: 4px solid #3498db; }
+        h1 { color: #2c3e50; font-size: 32px; }
+        #progress { color: #7f8c8d; font-size: 20px; font-weight: bold; margin-bottom: 20px; }
+        #question-box { background: #fdf5e6; padding: 20px; border-radius: 15px; margin-bottom: 20px; font-size: 28px; font-weight: bold; color: #333; line-height: 1.5; text-align: left; position: relative; }
+        .tts-btn { background: #f39c12; color: white; border: none; border-radius: 50%; width: 60px; height: 60px; font-size: 30px; cursor: pointer; position: absolute; right: 20px; top: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); transition: transform 0.2s; }
+        .tts-btn:hover { transform: scale(1.1); background: #e67e22; }
+        .options-grid { display: flex; flex-direction: column; gap: 15px; }
+        .option-btn { background: #ecf0f1; border: 3px solid #bdc3c7; border-radius: 15px; padding: 15px 20px; font-size: 24px; text-align: left; cursor: pointer; transition: all 0.3s; color: #2c3e50; }
+        .option-btn:hover { background: #d5dbdb; transform: translateX(10px); }
+        .correct { background: #d5f5e3 !important; border-color: #2ecc71 !important; color: #27ae60 !important; }
+        .wrong { background: #fadbd8 !important; border-color: #e74c3c !important; color: #c0392b !important; }
+        #feedback { font-size: 28px; font-weight: bold; margin-top: 20px; height: 40px; }
+        .next-btn { background: #3498db; color: white; border: none; border-radius: 15px; font-size: 24px; padding: 15px 40px; cursor: pointer; margin-top: 20px; display: none; text-decoration: none; }
+        .next-btn:hover { background: #2980b9; }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <h1>📖 期末挑戰第二關：文意測驗</h1>
+        <div id="progress">題目：1 / 7</div>
+        <div id="question-box">
+            <span id="question-text"></span>
+            <button class="tts-btn" onclick="speakText()" title="語音報讀">🔊</button>
+        </div>
+        <div class="options-grid" id="options-container"></div>
+        <div id="feedback"></div>
+        <a href="final_level3.html" class="next-btn" id="next-level-btn">進入第三關 ➡️</a>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "許芳宜在文中描述自己成長背景時，提到她最初對「夢想」的態度為何？", options: ["早早就規劃好要出國深造", "充滿自信，從小就立志成為舞蹈家", "不敢有夢想，擔心自己什麼都做不好", "受到家人高度期待，備感壓力"], ans: "不敢有夢想，擔心自己什麼都做不好" },
+            { q: "許芳宜在小學四年級第一次上臺跳舞後，為什麼會深深喜歡上那種感覺？", options: ["因為可以扮演角色，暫時不用當現實中的自己", "因為可以獲得觀眾的熱烈掌聲", "因為可以證明自己的學業成績並非全部", "因為可以藉由跳舞賺取獎金"], ans: "因為可以扮演角色，暫時不用當現實中的自己" },
+            { q: "許芳宜在紐約早餐車前，最初是如何與小販交流的？", options: ["用流利的英文溝通", "只用手指著想買的東西，說「這個、這個」", "直接將翻譯機遞給小販看", "寫在紙條上遞給對方"], ans: "只用手指著想買的東西，說「這個、這個」" },
+            { q: "許芳宜決定練習開口說英文，她第一次成功點餐的內容包含哪些東西？", options: ["藍莓貝果與熱可可", "原味貝果加上果醬與紅茶", "肉桂葡萄乾貝果、奶油起司與咖啡", "全麥貝果與柳橙汁"], ans: "肉桂葡萄乾貝果、奶油起司與咖啡" },
+            { q: "在第一次嘗試開口失敗後，許芳宜當下的心情如何？", options: ["覺得無所謂，明天再來就好", "憤怒地想找老師抱怨", "慶幸自己至少還用手指了食物", "沮喪自責，並不斷反問自己為什麼沒辦法開口"], ans: "沮喪自責，並不斷反問自己為什麼沒辦法開口" },
+            { q: "許芳宜為什麼將點餐成功稱為自己的「勇敢」？", options: ["因為她成功節省了早餐的開銷", "因為那是她第一次在紐約吃到貝果", "因為她在小販面前展現了高超的舞技", "因為她克服了恐懼並完成了自我設定的挑戰"], ans: "因為她克服了恐懼並完成了自我設定的挑戰" },
+            { q: "許芳宜認為「勇敢」帶給她在往後十九年舞蹈生涯最大的改變是什麼？", options: ["讓她再也不會跳錯舞步", "讓她學會如何快速背單字", "讓她學會「不怕」，不再因失敗或淘汰而畏縮", "讓她在世界各地教學時更有威嚴"], ans: "讓她學會「不怕」，不再因失敗或淘汰而畏縮" }
+        ];
+
+        let currentQ = 0;
+        let isWaiting = false;
+
+        function loadQuestion() {
+            if (currentQ >= questions.length) { endGame(); return; }
+            isWaiting = false;
+            document.getElementById("progress").innerText = `進度：${currentQ + 1} / ${questions.length}`;
+            document.getElementById("question-text").innerText = questions[currentQ].q;
+            document.getElementById("feedback").innerText = "";
+            const optContainer = document.getElementById("options-container");
+            optContainer.innerHTML = "";
+            
+            questions[currentQ].options.forEach((opt, index) => {
+                const btn = document.createElement("button");
+                btn.className = "option-btn";
+                btn.innerText = `${["A", "B", "C", "D"][index]}. ${opt}`;
+                btn.onclick = () => checkAnswer(opt, btn);
+                optContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selected, btn) {
+            if (isWaiting) return;
+            isWaiting = true;
+            window.speechSynthesis.cancel(); // 停止語音
+            if (selected === questions[currentQ].ans) {
+                btn.classList.add("correct");
+                document.getElementById("feedback").innerText = "🎉 答對了！非常棒！";
+                document.getElementById("feedback").style.color = "#27ae60";
+                setTimeout(() => { currentQ++; loadQuestion(); }, 1500);
+            } else {
+                btn.classList.add("wrong");
+                document.getElementById("feedback").innerText = "❌ 哎呀，再想想看喔！";
+                document.getElementById("feedback").style.color = "#c0392b";
+                setTimeout(() => { btn.classList.remove("wrong"); isWaiting = false; }, 1000);
+            }
+        }
+
+        function speakText() {
+            window.speechSynthesis.cancel();
+            let textToRead = questions[currentQ].q + " 選項有：";
+            questions[currentQ].options.forEach((opt, idx) => {
+                textToRead += `選項${["A", "B", "C", "D"][idx]}，${opt}。`;
+            });
+            const utterance = new SpeechSynthesisUtterance(textToRead);
+            utterance.lang = "zh-TW";
+            utterance.rate = 0.9; // 念慢一點點適合學生
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function endGame() {
+            document.getElementById("question-box").style.display = "none";
+            document.getElementById("options-container").style.display = "none";
+            document.getElementById("feedback").innerText = "🏆 恭喜你完成第二關！";
+            document.getElementById("next-level-btn").style.display = "inline-block";
+        }
+
+        loadQuestion();
+    </script>
+</body>
+</html>
