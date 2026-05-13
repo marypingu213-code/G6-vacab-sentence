@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>期末國語挑戰：找出正確的字</title>
+    <style>
+        body {
+            font-family: '微軟正黑體', 'Arial', sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        #game-container {
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        h1 {
+            color: #4a90e2;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        #progress {
+            color: #888;
+            font-size: 16px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        #emoji-display {
+            font-size: 80px;
+            margin: 20px 0;
+            animation: bounce 2s infinite;
+        }
+
+        #question-display {
+            font-size: 40px;
+            font-weight: bold;
+            margin: 30px 0;
+            letter-spacing: 2px;
+        }
+
+        .blank {
+            display: inline-block;
+            width: 60px;
+            height: 50px;
+            border-bottom: 4px solid #333;
+            margin: 0 10px;
+            color: #e74c3c;
+            text-align: center;
+            vertical-align: bottom;
+        }
+
+        #options-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .option-btn {
+            background-color: #f39c12;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 32px;
+            padding: 15px 30px;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .option-btn:hover {
+            background-color: #d68910;
+            transform: translateY(-2px);
+        }
+
+        .option-btn:active {
+            transform: translateY(2px);
+            box-shadow: none;
+        }
+
+        /* 答錯的動畫 */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-10px); }
+        }
+
+        .shake {
+            animation: shake 0.4s;
+            background-color: #e74c3c !important;
+        }
+
+        /* 答對的樣式 */
+        .correct {
+            background-color: #2ecc71 !important;
+            transform: scale(1.1);
+        }
+
+        #feedback {
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            height: 35px; /* 固定高度避免版面跳動 */
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-20px);}
+            60% {transform: translateY(-10px);}
+        }
+
+        /* 結算畫面按鈕 */
+        #restart-btn, #next-level-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 20px;
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <h1>✨ 期末挑戰第一關 ✨</h1>
+        <div id="progress">題目：1 / 11</div>
+        
+        <div id="emoji-display">🤔</div>
+        <div id="question-display">
+            <span id="prefix"></span>
+            <span class="blank" id="blank"></span>
+            <span id="suffix"></span>
+        </div>
+
+        <div id="options-container">
+            </div>
+
+        <div id="feedback"></div>
+
+        <button id="restart-btn" onclick="startGame()">再玩一次</button>
+        <button id="next-level-btn" onclick="window.location.href='index.html'">回大廳</button>
+    </div>
+
+    <script>
+        const quizData = [
+            { prefix: "", suffix: "愛", correct: "憐", options: ["憐", "連", "年"], emoji: "🥺" },
+            { prefix: "", suffix: "離", correct: "疏", options: ["疏", "書", "殊"], emoji: "🚶" },
+            { prefix: "寂", suffix: "", correct: "寞", options: ["寞", "摸", "沫"], emoji: "😔" },
+            { prefix: "", suffix: "牛", correct: "蝸", options: ["蝸", "過", "鍋"], emoji: "🐌" },
+            { prefix: "鳳", suffix: "樹", correct: "凰", options: ["凰", "黃", "皇"], emoji: "🌳" },
+            { prefix: "", suffix: "盪", correct: "迴", options: ["迴", "回", "洄"], emoji: "〰️" },
+            { prefix: "", suffix: "藍", correct: "蔚", options: ["蔚", "味", "位"], emoji: "🌊" },
+            { prefix: "", suffix: "誠", correct: "忠", options: ["忠", "中", "鐘"], emoji: "🤝" },
+            { prefix: "", suffix: "伴", correct: "夥", options: ["夥", "火", "果"], emoji: "🧑‍🤝‍🧑" },
+            { prefix: "門", suffix: "", correct: "檻", options: ["檻", "藍", "蘭"], emoji: "🚪" },
+            { prefix: "空", suffix: "", correct: "曠", options: ["曠", "廣", "黃"], emoji: "🏞️" }
+        ];
+
+        let currentIndex = 0;
+        let isWaiting = false; // 防止連續點擊
+
+        const prefixEl = document.getElementById("prefix");
+        const suffixEl = document.getElementById("suffix");
+        const blankEl = document.getElementById("blank");
+        const optionsContainer = document.getElementById("options-container");
+        const feedbackEl = document.getElementById("feedback");
+        const emojiEl = document.getElementById("emoji-display");
+        const progressEl = document.getElementById("progress");
+        const restartBtn = document.getElementById("restart-btn");
+        const nextLevelBtn = document.getElementById("next-level-btn");
+
+        function startGame() {
+            currentIndex = 0;
+            restartBtn.style.display = "none";
+            nextLevelBtn.style.display = "none";
+            optionsContainer.style.display = "flex";
+            feedbackEl.innerText = "";
+            loadQuestion();
+        }
+
+        // 打亂陣列順序的函數
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function loadQuestion() {
+            if (currentIndex >= quizData.length) {
+                endGame();
+                return;
+            }
+
+            isWaiting = false;
+            const currentData = quizData[currentIndex];
+            
+            progressEl.innerText = `進度：${currentIndex + 1} / ${quizData.length}`;
+            emojiEl.innerText = currentData.emoji;
+            prefixEl.innerText = currentData.prefix;
+            suffixEl.innerText = currentData.suffix;
+            blankEl.innerText = "";
+            feedbackEl.innerText = "";
+            feedbackEl.style.color = "#333";
+
+            optionsContainer.innerHTML = "";
+            
+            // 複製一份選項並打亂順序，這樣每次出現的位置都不一樣
+            let displayOptions = [...currentData.options];
+            shuffleArray(displayOptions);
+
+            displayOptions.forEach(opt => {
+                const btn = document.createElement("button");
+                btn.classList.add("option-btn");
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(opt, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selected, btnElement) {
+            if (isWaiting) return;
+            isWaiting = true;
+
+            const currentData = quizData[currentIndex];
+
+            if (selected === currentData.correct) {
+                // 答對了
+                btnElement.classList.add("correct");
+                blankEl.innerText = selected;
+                feedbackEl.innerText = "🎉 答對了！太棒了！";
+                feedbackEl.style.color = "#2ecc71";
+                
+                // 延遲1秒後換下一題
+                setTimeout(() => {
+                    currentIndex++;
+                    loadQuestion();
+                }, 1000);
+            } else {
+                // 答錯了
+                btnElement.classList.add("shake");
+                feedbackEl.innerText = "❌ 哎呀，再想一下喔！";
+                feedbackEl.style.color = "#e74c3c";
+                
+                // 移除震動動畫，讓學生可以重按
+                setTimeout(() => {
+                    btnElement.classList.remove("shake");
+                    isWaiting = false;
+                }, 400);
+            }
+        }
+
+        function endGame() {
+            emojiEl.innerText = "🏆";
+            prefixEl.innerText = "恭喜過關！";
+            blankEl.style.display = "none";
+            suffixEl.innerText = "";
+            optionsContainer.style.display = "none";
+            feedbackEl.innerText = "你完成了所有的字詞挑戰！";
+            feedbackEl.style.color = "#f39c12";
+            restartBtn.style.display = "inline-block";
+            nextLevelBtn.style.display = "inline-block";
+            progressEl.innerText = "完成！";
+        }
+
+        // 初始化遊戲
+        startGame();
+    </script>
+</body>
+</html>
