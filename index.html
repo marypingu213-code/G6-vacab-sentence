@@ -11,38 +11,57 @@
         /* 加上 position: relative 讓 QR code 可以乖乖待在右上角 */
         .canvas-16-9 { position: relative; width: 95vw; max-width: 1400px; aspect-ratio: 16 / 9; background-color: #fdf5e6; border-radius: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.15); display: flex; flex-direction: column; align-items: center; padding: 3%; box-sizing: border-box; overflow: hidden; }
         
-        .header-area { text-align: center; margin-bottom: 3%; }
+        .header-area { text-align: center; margin-bottom: 2%; }
         h1 { color: #5a4a42; font-size: 3.5vw; margin: 0 0 10px 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
         .subtitle { font-size: 1.8vw; color: #7b6855; margin: 0; }
         
-        /* 🏆 期末挑戰專屬按鈕樣式 */
-        .final-exam-btn {
-            display: inline-block;
-            margin-top: 15px;
-            padding: 1vw 3vw;
+        /* 🏆 期末挑戰專區樣式 */
+        .final-exam-section {
+            background-color: #fff3e0;
+            border: 3px dashed #f39c12;
+            border-radius: 20px;
+            padding: 15px 30px;
+            margin: 15px 0 25px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .final-exam-title {
+            color: #d35400;
             font-size: 2vw;
             font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .final-buttons-container {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .final-btn {
+            padding: 1vw 2vw;
+            font-size: 1.5vw;
+            font-weight: bold;
             color: #fff;
-            background: linear-gradient(45deg, #ff6b6b, #e74c3c);
             border-radius: 50px;
             text-decoration: none;
-            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s, box-shadow 0.3s;
-            animation: pulse 2s infinite; /* 呼吸燈動畫 */
-            border: 3px solid #fff;
+            border: 2px solid #fff;
         }
 
-        .final-exam-btn:hover {
+        .final-btn:hover {
             transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 10px 20px rgba(231, 76, 60, 0.6);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
         }
 
-        /* 按鈕呼吸燈動畫特效 */
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
-            70% { box-shadow: 0 0 0 15px rgba(231, 76, 60, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
-        }
+        /* 三個關卡不同顏色 */
+        .btn-level1 { background: linear-gradient(45deg, #ff6b6b, #e74c3c); }
+        .btn-level2 { background: linear-gradient(45deg, #4facfe, #00f2fe); color: #333; }
+        .btn-level3 { background: linear-gradient(45deg, #43e97b, #38f9d7); color: #333; }
         
         /* 📱 QR Code 專屬樣式 (固定在右上角) */
         .qr-box { position: absolute; top: 3%; right: 3%; background: #fff; padding: 10px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; border: 3px dashed #f39c12; transition: transform 0.3s; }
@@ -62,7 +81,8 @@
             .lesson-title { font-size: 28px; } 
             .qr-box p { font-size: 16px; } 
             .qr-box img { width: 120px; height: 120px; } 
-            .final-exam-btn { font-size: 26px; padding: 15px 40px; }
+            .final-exam-title { font-size: 24px; }
+            .final-btn { font-size: 20px; padding: 12px 25px; }
         }
     </style>
 </head>
@@ -77,7 +97,15 @@
         <div class="header-area">
             <h1>🏫 特教國語遊戲網 🎪</h1>
             <p class="subtitle">請選擇今天要挑戰的課程！</p>
-            <a href="final_level1.html" class="final-exam-btn">🔥 點我進入：期末國語大挑戰 🔥</a>
+        </div>
+
+        <div class="final-exam-section">
+            <div class="final-exam-title">✨ 期末國語大挑戰 ✨</div>
+            <div class="final-buttons-container">
+                <a href="final_level1.html" class="final-btn btn-level1">第一關：找錯字</a>
+                <a href="final_level2.html" class="final-btn btn-level2">第二關：文意選擇</a>
+                <a href="final_level3.html" class="final-btn btn-level3">第三關：排列句子</a>
+            </div>
         </div>
         
         <div class="lesson-list" id="lesson-container"></div>
@@ -97,7 +125,7 @@
                 
                 // 檢查 data.js 中是否有 customUrl 欄位
                 if (lessonInfo.customUrl) {
-                    card.href = lessonInfo.customUrl; // 直接連到指定的 HTML 檔案 (例如測驗網頁)
+                    card.href = lessonInfo.customUrl; // 直接連到指定的 HTML 檔案
                 } else {
                     card.href = `lesson.html?id=${lessonId}`; // 維持原本的流程
                 }
