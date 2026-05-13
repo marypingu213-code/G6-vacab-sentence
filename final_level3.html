@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>期末國語挑戰：第三關</title>
+    <style>
+        body { font-family: '微軟正黑體', sans-serif; background-color: #fdf2e9; margin: 0; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        #game-container { background: #fff; border-radius: 20px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); padding: 30px; max-width: 800px; width: 100%; text-align: center; border: 4px solid #e67e22; margin-top: 20px; }
+        h1 { color: #d35400; font-size: 32px; }
+        #progress { color: #7f8c8d; font-size: 20px; font-weight: bold; margin-bottom: 20px; }
+        
+        /* 作答區 */
+        .answer-area { min-height: 80px; background: #fae5d3; border: 3px dashed #e67e22; border-radius: 15px; padding: 15px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; align-items: center; margin-bottom: 30px; }
+        
+        /* 碎片庫 */
+        .pieces-area { min-height: 80px; background: #ebedef; border-radius: 15px; padding: 20px; display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; align-items: center; }
+        
+        /* 文字方塊積木 */
+        .word-piece { background: #3498db; color: white; padding: 15px 25px; font-size: 26px; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.2); transition: transform 0.1s; user-select: none; }
+        .word-piece:hover { transform: translateY(-3px); background: #2980b9; }
+        .word-piece:active { transform: translateY(2px); box-shadow: none; }
+        
+        .action-btns { margin-top: 30px; display: flex; justify-content: center; gap: 20px; }
+        .btn { border: none; border-radius: 15px; font-size: 24px; padding: 15px 30px; cursor: pointer; color: white; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+        .check-btn { background: #2ecc71; }
+        .check-btn:hover { background: #27ae60; }
+        .reset-btn { background: #e74c3c; }
+        .reset-btn:hover { background: #c0392b; }
+        
+        #feedback { font-size: 28px; font-weight: bold; margin-top: 20px; height: 40px; }
+        .home-btn { background: #9b59b6; display: none; text-decoration: none; margin-top: 20px;}
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <h1>🧩 期末挑戰第三關：句子重組</h1>
+        <div id="progress">題目：1 / 4</div>
+        <p style="font-size: 22px; color: #555;">請點擊下方語詞，將它們排成正確的句子</p>
+
+        <div class="answer-area" id="answer-area"></div>
+
+        <div class="pieces-area" id="pieces-area"></div>
+
+        <div class="action-btns">
+            <button class="btn reset-btn" onclick="resetCurrent()">🔄 重排</button>
+            <button class="btn check-btn" onclick="checkAnswer()">✅ 送出答案</button>
+        </div>
+
+        <div id="feedback"></div>
+        <a href="index.html" class="btn home-btn" id="home-btn">🎉 回到大廳 🎉</a>
+    </div>
+
+    <script>
+        const sentences = [
+            ["地球", "是圓的", "總有", "再見的", "時候"],
+            ["摯友", "你是", "我", "永遠的", "知己"],
+            ["要有", "與人", "交往的", "誠意"],
+            ["學著", "不怕", "丟臉", "不怕別人", "笑我", "愚蠢"]
+        ];
+
+        let currentS = 0;
+        let isWaiting = false;
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function loadSentence() {
+            if (currentS >= sentences.length) { endGame(); return; }
+            isWaiting = false;
+            document.getElementById("progress").innerText = `進度：${currentS + 1} / ${sentences.length}`;
+            document.getElementById("feedback").innerText = "";
+            document.getElementById("answer-area").innerHTML = "";
+            
+            const piecesArea = document.getElementById("pieces-area");
+            piecesArea.innerHTML = "";
+            
+            // 打亂陣列
+            let shuffled = shuffle([...sentences[currentS]]);
+            
+            shuffled.forEach(word => {
+                const piece = document.createElement("div");
+                piece.className = "word-piece";
+                piece.innerText = word;
+                piece.onclick = () => moveToAnswer(piece);
+                piecesArea.appendChild(piece);
+            });
+        }
+
+        function moveToAnswer(piece) {
+            if(isWaiting) return;
+            const answerArea = document.getElementById("answer-area");
+            piece.onclick = () => moveToPieces(piece);
+            answerArea.appendChild(piece);
+        }
+
+        function moveToPieces(piece) {
+            if(isWaiting) return;
+            const piecesArea = document.getElementById("pieces-area");
+            piece.onclick = () => moveToAnswer(piece);
+            piecesArea.appendChild(piece);
+        }
+
+        function resetCurrent() {
+            if(isWaiting) return;
+            loadSentence(); // 重新載入這一題
+        }
+
+        function checkAnswer() {
+            if(isWaiting) return;
+            const answerArea = document.getElementById("answer-area");
+            const piecesArea = document.getElementById("pieces-area");
+            
+            // 如果下面還有方塊沒選完
+            if (piecesArea.children.length > 0) {
+                document.getElementById("feedback").innerText = "⚠️ 還有語詞沒有排上去喔！";
+                document.getElementById("feedback").style.color = "#e67e22";
+                return;
+            }
+
+            // 組合學生的答案
+            let studentAns = Array.from(answerArea.children).map(p => p.innerText).join("");
+            let correctAns = sentences[currentS].join("");
+
+            if (studentAns === correctAns) {
+                isWaiting = true;
+                document.getElementById("feedback").innerText = "🎉 太棒了！句子非常通順！";
+                document.getElementById("feedback").style.color = "#27ae60";
+                setTimeout(() => { currentS++; loadSentence(); }, 1500);
+            } else {
+                document.getElementById("feedback").innerText = "❌ 順序好像怪怪的，再試一次！";
+                document.getElementById("feedback").style.color = "#c0392b";
+            }
+        }
+
+        function endGame() {
+            document.querySelector(".answer-area").style.display = "none";
+            document.querySelector(".pieces-area").style.display = "none";
+            document.querySelector(".action-btns").style.display = "none";
+            document.querySelector("p").style.display = "none";
+            document.getElementById("feedback").innerText = "🏆 恭喜你！期末挑戰全數通關！";
+            document.getElementById("home-btn").style.display = "inline-block";
+        }
+
+        loadSentence();
+    </script>
+</body>
+</html>
