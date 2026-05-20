@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第四關：語意配對大挑戰</title>
+    <style>
+        body {
+            font-family: '微軟正黑體', sans-serif;
+            background-color: #fdf2f8;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        #game-container {
+            background-color: white;
+            border-radius: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            padding: 40px;
+            max-width: 850px;
+            width: 95%;
+            text-align: center;
+            border: 5px solid #a18cd1;
+        }
+
+        .header { color: #6d28d9; font-size: 32px; margin-bottom: 10px; }
+        
+        #progress { font-size: 20px; color: #666; margin-bottom: 20px; }
+
+        /* 題目顯示區 */
+        #question-box {
+            background-color: #f3f4f6;
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        #question-box:hover { background-color: #e5e7eb; }
+        #word-display { font-size: 60px; font-weight: bold; color: #e11d48; display: block; }
+        .speak-hint { font-size: 16px; color: #888; margin-top: 5px; }
+
+        /* 選項區 */
+        #options-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .option-btn {
+            background-color: #ffffff;
+            border: 3px solid #ddd;
+            border-radius: 20px;
+            padding: 25px 20px;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+            line-height: 1.4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .option-btn:hover { border-color: #a18cd1; background-color: #f5f3ff; }
+        
+        .correct { background-color: #10b981 !important; color: white !important; border-color: #059669 !important; }
+        .wrong { background-color: #ef4444 !important; color: white !important; border-color: #b91c1c !important; }
+
+        #feedback { font-size: 28px; font-weight: bold; margin-top: 25px; height: 40px; }
+
+        /* 結算 */
+        .result-screen { display: none; }
+        .home-btn { 
+            background-color: #8b5cf6; color: white; padding: 15px 40px; 
+            border-radius: 50px; text-decoration: none; font-size: 24px; margin-top: 20px; display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div id="quiz-area">
+        <h1 class="header">🎧 第四關：語意配對大挑戰</h1>
+        <div id="progress">進度：1 / 20</div>
+
+        <div id="question-box" onclick="speakCurrentWord()">
+            <span id="word-display">載入中...</span>
+            <div class="speak-hint">🔈 點我重複唸詞語</div>
+        </div>
+
+        <div id="options-container"></div>
+        <div id="feedback"></div>
+    </div>
+
+    <div id="result-area" class="result-screen">
+        <h1 style="font-size: 60px;">🎉 太厲害了！</h1>
+        <p style="font-size: 30px;">你完成了所有的語意配對挑戰！</p>
+        <a href="index.html" class="home-btn">🏠 回到大廳</a>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        // 圖片 1
+        { word: "契機", def: "事物轉變的關鍵", options: ["碰巧、正好", "事物轉變的關鍵", "連綿的山"] },
+        { word: "蒼黑", def: "青黑色、灰黑色", options: ["青黑色、灰黑色", "事物的範圍", "所經歷的人生"] },
+        { word: "山巒", def: "連綿的山", options: ["連綿的山", "形容謹慎小心", "像高山穩固"] },
+        { word: "恰巧", def: "碰巧、正好", options: ["碰巧、正好", "呆蠢笨拙", "私下裡高興"] },
+        { word: "領域", def: "事物的範圍", options: ["事物的範圍", "遵守規矩", "遵守規矩"] },
+        { word: "生涯", def: "指所過的生活或所經歷的人生", options: ["指所過的生活或所經歷的人生", "事物轉變關鍵", "沒有希望"] },
+        // 圖片 2
+        { word: "出言不遜", def: "形容人講話傲慢無禮", options: ["形容謹慎小心", "形容人講話傲慢無禮", "不被小規矩拘束"] },
+        { word: "戰戰兢兢", def: "形容謹慎小心的樣子", options: ["形容謹慎小心的樣子", "遵守規矩", "莫名的奇怪"] },
+        { word: "循規蹈矩", def: "遵守規矩", options: ["距離遙遠", "遵守規矩", "非常珍貴"] },
+        { word: "不拘小節", def: "不被生活上的小規矩所拘束", options: ["不被生活上的小規矩所拘束", "私下裡高興", "遵守規矩"] },
+        { word: "莫名其妙", def: "形容事情稀奇古怪，難以理解", options: ["遵守規矩", "難以理解的事情", "形容謹慎小心"] },
+        // 圖片 3
+        { word: "不偏不倚", def: "一點也沒有偏差", options: ["距離遙遠", "私下高興", "一點也沒有偏差"] },
+        { word: "暗自竊喜", def: "私下裡高興", options: ["私下裡高興", "穩固聳立", "呆蠢笨拙"] },
+        { word: "遙不可及", def: "距離遙遠無法到達", options: ["距離遙遠無法到達", "一點沒偏差", "老遠前往"] },
+        { word: "屹立不搖", def: "像高山一樣穩固的聳立著", options: ["形容沒有希望", "像高山一樣穩固的聳立著", "憤怒、怨恨"] },
+        // 圖片 4
+        { word: "來賓", def: "蒞臨的賓客", options: ["呆蠢笨拙", "蒞臨的賓客", "私下高興"] },
+        { word: "遠赴", def: "太老遠的前往某地", options: ["太老遠的前往某地", "沒有希望", "穩固聳立"] },
+        { word: "愚蠢", def: "呆蠢笨拙", options: ["憤怒怨恨", "呆蠢笨拙", "遵守規矩"] },
+        { word: "憤恨", def: "憤怒、怨恨", options: ["憤怒、怨恨", "老遠前往", "私下高興"] },
+        { word: "彌足珍貴", def: "形容非常珍貴", options: ["遵守規矩", "形容非常珍貴", "所經歷的人生"] }
+    ];
+
+    let currentIndex = 0;
+    let isSpeaking = false;
+
+    function speak(text, callback) {
+        window.speechSynthesis.cancel();
+        const synth = window.speechSynthesis;
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'zh-TW';
+        utter.rate = 0.8;
+        utter.onend = callback;
+        synth.speak(utter);
+    }
+
+    function speakCurrentWord() {
+        speak(quizData[currentIndex].word);
+    }
+
+    function loadQuestion() {
+        if (currentIndex >= quizData.length) {
+            document.getElementById('quiz-area').style.display = 'none';
+            document.getElementById('result-area').style.display = 'block';
+            speak("太棒了！你完成了所有的挑戰！");
+            return;
+        }
+
+        const data = quizData[currentIndex];
+        document.getElementById('progress').innerText = `進度：${currentIndex + 1} / ${quizData.length}`;
+        document.getElementById('word-display').innerText = data.word;
+        document.getElementById('feedback').innerText = "";
+        
+        const container = document.getElementById('options-container');
+        container.innerHTML = "";
+
+        // 洗牌選項
+        let shuffledOptions = [...data.options].sort(() => Math.random() - 0.5);
+
+        shuffledOptions.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(opt, btn);
+            container.appendChild(btn);
+        });
+
+        // 自動讀出：詞語 + 定義是什麼？
+        setTimeout(() => {
+            speak(data.word + "。 的意思是哪一個？");
+        }, 500);
+    }
+
+    function checkAnswer(selected, btn) {
+        const data = quizData[currentIndex];
+        if (selected === data.def) {
+            btn.classList.add('correct');
+            document.getElementById('feedback').innerText = "🎉 答對了！";
+            document.getElementById('feedback').style.color = "#10b981";
+            speak("答對了。" + data.word + "的意思是" + data.def, () => {
+                setTimeout(() => {
+                    currentIndex++;
+                    loadQuestion();
+                }, 500);
+            });
+        } else {
+            btn.classList.add('wrong');
+            document.getElementById('feedback').innerText = "❌ 再試試看喔！";
+            document.getElementById('feedback').style.color = "#ef4444";
+            speak("不對喔，再想一下。點選的是：" + selected);
+            setTimeout(() => btn.classList.remove('wrong'), 1000);
+        }
+    }
+
+    window.onload = loadQuestion;
+</script>
+
+</body>
+</html>
