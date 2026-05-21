@@ -26,9 +26,9 @@
             border: 5px solid #a18cd1;
         }
 
-        .header { color: #6d28d9; font-size: 32px; margin-bottom: 10px; }
+        .header { color: #6d28d9; font-size: 32px; margin-bottom: 10px; font-weight: bold;}
         
-        #progress { font-size: 20px; color: #666; margin-bottom: 20px; }
+        #progress { font-size: 20px; color: #666; margin-bottom: 20px; font-weight: bold;}
 
         /* 題目顯示區 */
         #question-box {
@@ -41,6 +41,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            border: 3px dashed #a18cd1;
         }
         #question-box:hover { background-color: #e5e7eb; }
         #word-display { font-size: 60px; font-weight: bold; color: #e11d48; display: block; }
@@ -72,17 +73,41 @@
         
         .correct { background-color: #10b981 !important; color: white !important; border-color: #059669 !important; }
         .wrong { background-color: #ef4444 !important; color: white !important; border-color: #b91c1c !important; }
-        .selected { border-color: #8b5cf6; background-color: #f5f3ff; }
+        .selected { border-color: #8b5cf6; background-color: #f5f3ff; box-shadow: 0 0 10px rgba(139, 92, 246, 0.3); }
 
         .speaker-icon { font-size: 28px; }
 
-        #feedback { font-size: 24px; font-weight: bold; margin-top: 25px; height: 35px; color: #333;}
+        #feedback { font-size: 28px; font-weight: bold; margin-top: 20px; height: 35px; color: #333;}
+
+        /* 下一題按鈕 */
+        #next-btn {
+            display: none; /* 預設隱藏 */
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            padding: 15px 40px;
+            font-size: 26px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+            transition: transform 0.2s, background-color 0.2s;
+            animation: bounceIn 0.5s;
+        }
+        #next-btn:hover { background-color: #2563eb; transform: translateY(-3px); }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
 
         /* 結算 */
         .result-screen { display: none; }
         .home-btn { 
             background-color: #8b5cf6; color: white; padding: 15px 40px; 
             border-radius: 50px; text-decoration: none; font-size: 24px; margin-top: 20px; display: inline-block;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -95,15 +120,18 @@
 
         <div id="question-box" onclick="speakCurrentWord()">
             <span id="word-display">載入中...</span>
-            <div class="speak-hint">🔈 點擊唸詞語</div>
+            <div class="speak-hint">🔈 點擊這裡唸詞語</div>
         </div>
 
         <div id="options-container"></div>
         <div id="feedback"></div>
+        
+        <button id="next-btn" onclick="nextQuestion()">下一題 ➡️</button>
     </div>
 
     <div id="result-area" class="result-screen">
-        <h1 style="font-size: 60px;">完成挑戰！</h1>
+        <h1 style="font-size: 60px;">🎉 完成挑戰！</h1>
+        <p style="font-size: 24px; color: #666;">恭喜你順利通過語意配對關卡！</p>
         <a href="index.html" class="home-btn">🏠 回到大廳</a>
     </div>
 </div>
@@ -115,21 +143,23 @@
         { word: "山巒", def: "連綿的山", options: ["連綿的山", "形容謹慎小心", "像高山穩固"] },
         { word: "恰巧", def: "碰巧、正好", options: ["碰巧、正好", "呆蠢笨拙", "私下裡高興"] },
         { word: "領域", def: "事物的範圍", options: ["事物的範圍", "遵守規矩", "遵守規矩"] },
-        { word: "生涯", def: "指所過的生活或所經歷的人生", options: ["指所過的生活或所經歷的人生", "事物轉變關鍵", "沒有希望"] },
+        { word: "生涯", def: "指所過的生活或所經歷的人生", options: ["指所過的生活或所經歷的人生", "事物轉變的關鍵", "沒有希望"] },
         { word: "出言不遜", def: "形容人講話傲慢無禮", options: ["形容謹慎小心", "形容人講話傲慢無禮", "不被小規矩拘束"] },
-        { word: "戰戰兢兢", def: "形容謹慎小心的樣子", options: ["形容謹慎小心的樣子", "遵守規矩", "莫名的奇怪"] },
+        { word: "戰戰兢兢", def: "形容謹慎小心的樣子", options: ["形容謹慎小心的樣子", "遵守規矩", "形容事情稀奇古怪，難以理解"] },
         { word: "循規蹈矩", def: "遵守規矩", options: ["距離遙遠", "遵守規矩", "非常珍貴"] },
         { word: "不拘小節", def: "不被生活上的小規矩所拘束", options: ["不被生活上的小規矩所拘束", "私下裡高興", "遵守規矩"] },
-        { word: "莫名其妙", def: "形容事情稀奇古怪，難以理解", options: ["遵守規矩", "難以理解的事情", "形容謹慎小心"] },
-        { word: "不偏不倚", def: "一點也沒有偏差", options: ["距離遙遠", "私下高興", "一點也沒有偏差"] },
-        { word: "暗自竊喜", def: "私下裡高興", options: ["私下裡高興", "穩固聳立", "呆蠢笨拙"] },
-        { word: "遙不可及", def: "距離遙遠無法到達", options: ["距離遙遠無法到達", "一點沒偏差", "老遠前往"] },
+        // 修正了第十一題的選項，讓解答可以正確對應
+        { word: "莫名其妙", def: "形容事情稀奇古怪，難以理解", options: ["遵守規矩", "形容事情稀奇古怪，難以理解", "形容謹慎小心"] },
+        { word: "不偏不倚", def: "一點也沒有偏差", options: ["距離遙遠", "私下裡高興", "一點也沒有偏差"] },
+        { word: "暗自竊喜", def: "私下裡高興", options: ["私下裡高興", "像高山一樣穩固的聳立著", "呆蠢笨拙"] },
+        { word: "遙不可及", def: "距離遙遠無法到達", options: ["距離遙遠無法到達", "一點也沒有偏差", "大老遠的前往某地"] },
         { word: "屹立不搖", def: "像高山一樣穩固的聳立著", options: ["形容沒有希望", "像高山一樣穩固的聳立著", "憤怒、怨恨"] },
-        { word: "來賓", def: "蒞臨的賓客", options: ["呆蠢笨拙", "蒞臨的賓客", "私下高興"] },
-        { word: "遠赴", def: "太老遠的前往某地", options: ["太老遠的前往某地", "沒有希望", "穩固聳立"] },
-        { word: "愚蠢", def: "呆蠢笨拙", options: ["憤怒怨恨", "呆蠢笨拙", "遵守規矩"] },
-        { word: "憤恨", def: "憤怒、怨恨", options: ["憤怒、怨恨", "老遠前往", "私下高興"] },
-        { word: "彌足珍貴", def: "形容非常珍貴", options: ["遵守規矩", "形容非常珍貴", "所經歷的人生"] }
+        { word: "來賓", def: "蒞臨的賓客", options: ["呆蠢笨拙", "蒞臨的賓客", "私下裡高興"] },
+        // 修正了「大」老遠的錯字
+        { word: "遠赴", def: "大老遠的前往某地", options: ["大老遠的前往某地", "沒有希望", "像高山一樣穩固的聳立著"] },
+        { word: "愚蠢", def: "呆蠢笨拙", options: ["憤怒、怨恨", "呆蠢笨拙", "遵守規矩"] },
+        { word: "憤恨", def: "憤怒、怨恨", options: ["憤怒、怨恨", "大老遠的前往某地", "私下裡高興"] },
+        { word: "彌足珍貴", def: "形容非常珍貴", options: ["遵守規矩", "形容非常珍貴", "指所過的生活或所經歷的人生"] }
     ];
 
     let currentIndex = 0;
@@ -140,7 +170,7 @@
         const synth = window.speechSynthesis;
         const utter = new SpeechSynthesisUtterance(text);
         utter.lang = 'zh-TW';
-        utter.rate = 0.8;
+        utter.rate = 0.8; // 語速稍微放慢，適合學生聽
         synth.speak(utter);
     }
 
@@ -152,10 +182,13 @@
         if (currentIndex >= quizData.length) {
             document.getElementById('quiz-area').style.display = 'none';
             document.getElementById('result-area').style.display = 'block';
+            speak("太棒了！你完成了所有的配對挑戰！");
             return;
         }
 
         currentlySelectedOpt = null;
+        document.getElementById('next-btn').style.display = 'none'; // 隱藏下一題按鈕
+        
         const data = quizData[currentIndex];
         document.getElementById('progress').innerText = `進度：${currentIndex + 1} / ${quizData.length}`;
         document.getElementById('word-display').innerText = data.word;
@@ -192,40 +225,54 @@
             currentlySelectedOpt = selected;
             document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
-            document.getElementById('feedback').innerText = "再點一次確認答案";
+            document.getElementById('feedback').innerText = "再點一次確認答案👆";
+            document.getElementById('feedback').style.color = "#8b5cf6";
             speak(selected);
             return;
         }
 
-        // 如果點擊的是已經選取的選項，則進行確認
+        // 如果點擊的是已經選取的選項，則進行確認對錯
         const data = quizData[currentIndex];
+        
+        // 鎖定所有按鈕防止重複點擊
         document.querySelectorAll('.option-btn').forEach(b => {
-            b.onclick = null; // 鎖定所有按鈕
+            b.onclick = null; 
             b.classList.remove('selected');
         });
 
         if (selected === data.def) {
             btn.classList.add('correct');
-            document.getElementById('feedback').innerText = "正確";
-            setTimeout(() => {
-                currentIndex++;
-                loadQuestion();
-            }, 1500);
+            document.getElementById('feedback').innerText = "⭕ 正確！";
+            document.getElementById('feedback').style.color = "#10b981";
+            speak("正確");
+            // 答對時，顯示「下一題」按鈕
+            document.getElementById('next-btn').style.display = 'inline-block';
         } else {
             btn.classList.add('wrong');
-            document.getElementById('feedback').innerText = "不對喔";
+            document.getElementById('feedback').innerText = "❌ 不對喔，再想想看";
+            document.getElementById('feedback').style.color = "#ef4444";
+            speak("不對喔");
+            
             setTimeout(() => {
                 btn.classList.remove('wrong');
                 document.getElementById('feedback').innerText = "";
                 currentlySelectedOpt = null; // 重置選取狀態
                 
-                // 恢復按鈕點擊事件
-                document.querySelectorAll('.option-btn').forEach((b, index) => {
+                // 恢復按鈕點擊事件，讓學生可以重新選擇
+                document.querySelectorAll('.option-btn').forEach((b) => {
                      let text = b.querySelector('span').innerText;
+                     // 把喇叭圖示文字濾掉，只抓選項文字
+                     text = text.replace('🔊', '').trim();
                      b.onclick = () => handleOptionClick(text, b);
                 });
             }, 1500);
         }
+    }
+
+    // 點擊「下一題」按鈕時執行的函數
+    function nextQuestion() {
+        currentIndex++;
+        loadQuestion();
     }
 
     window.onload = loadQuestion;
